@@ -1,0 +1,56 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.1.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+	id 'application'
+	// id 'jsonschema2pojo'
+}
+
+group = 'com.debez'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+mainClassName = 'com.debez.consumer.ConsumerApplication'
+
+def lombokVersion = '1.18.10'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:${js2p.version}'
+
+		// Lombok
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	// Apache Commons
+	implementation "commons-lang:commons-lang:2.6"
+
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude module: 'spring-boot-starter-tomcat'
+		// exclude group: 'org.apache.tomcat'
+	}
+
+	implementation 'org.springframework.boot:spring-boot-starter-reactor-netty:2.2.1.RELEASE'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux:2.2.1.RELEASE'
+
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+}
+
+// jsonSchema2Pojo {
+// 	generateBuilders = true
+// 	source = files("${sourceSets.main.output.resourcesDir}/static/test.json")
+// 	targetDirectory = file("${project.buildDir}/generated-sources/js2p")
+// 	// source = files("${sourceSets.main.output.resourcesDir}/json")
+// }
+
+test {
+	useJUnitPlatform()
+}
