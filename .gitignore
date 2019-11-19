@@ -3,7 +3,7 @@
 
 # !**/src/main/**
 src/main/java/com/debez/consumer/models/
-
+bin/
 
 ### Initializr ###
 HELP.md

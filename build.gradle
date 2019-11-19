@@ -36,7 +36,6 @@ apply plugin: 'io.spring.dependency-management'
 
 apply plugin: 'jsonschema2pojo'
 
-
 group = 'com.debez'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
