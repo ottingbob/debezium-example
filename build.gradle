@@ -1,10 +1,35 @@
-plugins {
-	id 'org.springframework.boot' version '2.2.1.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-	id 'java'
-	id 'application'
-	// id 'jsonschema2pojo'
+// plugins {
+// 	id 'org.springframework.boot' version '2.2.1.RELEASE'
+// 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+// 	id 'java'
+// 	id 'application'
+
+//	id 'org.jsonschema2pojo.jsonschema2pojo-gradle-plugin' version '0.4.0'
+
+// }
+
+buildscript {
+	ext {
+		springBootVersion = '2.2.1.RELEASE'
+	}
+	repositories { jcenter() }
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+
+		classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.0'
+	}
 }
+
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+apply plugin: 'jsonschema2pojo'
+
 
 group = 'com.debez'
 version = '0.0.1-SNAPSHOT'
@@ -16,10 +41,12 @@ def lombokVersion = '1.18.10'
 
 repositories {
 	mavenCentral()
+	jcenter()
 }
 
 dependencies {
-	// classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:${js2p.version}'
+	// :${js2p.version}
+	// implementation 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.0'
 
 		// Lombok
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -44,12 +71,46 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
-// jsonSchema2Pojo {
-// 	generateBuilders = true
-// 	source = files("${sourceSets.main.output.resourcesDir}/static/test.json")
-// 	targetDirectory = file("${project.buildDir}/generated-sources/js2p")
-// 	// source = files("${sourceSets.main.output.resourcesDir}/json")
+// task moveFiles(type: Copy) {
+// 	// from "${project.buildDir}/generated"
+// 	from "${sourceSets.main.java.srcDirs[1]}/**"
+// 	into "${sourceSets.main.java.srcDirs[0]}/"
 // }
+
+task moveFiles() {
+	println "${project.buildDir}/generated/"
+	ant.move(file: "${project.buildDir}/generated/", tofile: "${sourceSets.main.java.srcDirs[0]}/")
+}
+
+// Alias for generateJsonSchema2Pojo
+task generate {
+	dependsOn generateJsonSchema2Pojo, moveFiles
+
+	doLast {
+		println "Generated the JSON Schema from location: ${sourceSets.main.output.resourcesDir}/static"
+		// Print out all files in directory
+		println fileTree("${project.buildDir}").filter { it.isFile() }.files.name		
+
+		// Move files to actual directory
+		
+		println "${sourceSets.main.java.srcDirs[1]}"
+	}
+}
+
+jsonSchema2Pojo {
+	generateBuilders = true
+	// source = files("/home/yobawb/dev/java/debez/consumer/src/main/resources/static/test.json")
+	// source = files("${sourceSets.main.output.resourcesDir}/static/test.json")
+
+	source = files("${sourceSets.main.output.resourcesDir}/static")
+	targetDirectory = file("${project.buildDir}/generated")
+	sourceType = 'json'
+
+	targetPackage = 'com.debez.consumer.models'
+	useLongIntegers = true
+	includeGetters = true
+	includeSetters = true
+}
 
 test {
 	useJUnitPlatform()
