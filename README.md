@@ -1,6 +1,6 @@
 ### Debez Knees
 
-![]https://github.com/ottingbob/debezium-example/workflows/.github/workflows/action.yml/badge.svg
+![](https://github.com/ottingbob/debezium-example/workflows/.github/workflows/action.yml/badge.svg)
 
 `docker-compose up --build`
 
