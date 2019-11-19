@@ -96,6 +96,7 @@ task generate {
 gradle.taskGraph.whenReady {
 	graph -> if (graph.hasTask(run) || graph.hasTask(build)) {
 		generateJsonSchema2Pojo.enabled = false
+		// Test task is not working due to consumer having issues during startup of test
 		test.enabled = false
 	}
 }
