@@ -1,5 +1,7 @@
 ### Debez Knees
 
+![badge]https://github.com/ottingbob/debezium-example/workflows/action/badge.svg
+
 `docker-compose up --build`
 
 `./gradlew run`
