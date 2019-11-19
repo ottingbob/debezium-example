@@ -1,12 +1,14 @@
+// Was not able to get the jsonschema2pojo plugin working successfully with the
+// plugins block since it is not a `core` gradle plugin
+//===============================================================================//
 // plugins {
 // 	id 'org.springframework.boot' version '2.2.1.RELEASE'
 // 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 // 	id 'java'
 // 	id 'application'
-
 //	id 'org.jsonschema2pojo.jsonschema2pojo-gradle-plugin' version '0.4.0'
-
 // }
+//===============================================================================//
 
 buildscript {
 	ext {
@@ -45,10 +47,7 @@ repositories {
 }
 
 dependencies {
-	// :${js2p.version}
-	// implementation 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.0'
-
-		// Lombok
+	// Lombok
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
@@ -71,15 +70,9 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
-// task moveFiles(type: Copy) {
-// 	// from "${project.buildDir}/generated"
-// 	from "${sourceSets.main.java.srcDirs[1]}/**"
-// 	into "${sourceSets.main.java.srcDirs[0]}/"
-// }
-
-task moveFiles() {
-	println "${project.buildDir}/generated/"
-	ant.move(file: "${project.buildDir}/generated/", tofile: "${sourceSets.main.java.srcDirs[0]}/")
+task moveFiles(type: Copy) {
+	from "${project.buildDir}/generated/"
+	into "${sourceSets.main.java.srcDirs[0]}/"
 }
 
 // Alias for generateJsonSchema2Pojo
@@ -88,20 +81,13 @@ task generate {
 
 	doLast {
 		println "Generated the JSON Schema from location: ${sourceSets.main.output.resourcesDir}/static"
-		// Print out all files in directory
+		// Print out all files in build directory
 		println fileTree("${project.buildDir}").filter { it.isFile() }.files.name		
-
-		// Move files to actual directory
-		
-		println "${sourceSets.main.java.srcDirs[1]}"
 	}
 }
 
 jsonSchema2Pojo {
 	generateBuilders = true
-	// source = files("/home/yobawb/dev/java/debez/consumer/src/main/resources/static/test.json")
-	// source = files("${sourceSets.main.output.resourcesDir}/static/test.json")
-
 	source = files("${sourceSets.main.output.resourcesDir}/static")
 	targetDirectory = file("${project.buildDir}/generated")
 	sourceType = 'json'
