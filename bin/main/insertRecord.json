@@ -157,35 +157,30 @@
     "name": "dbserver1.inventory.customers.Envelope"
   },
   "payload": {
-    "before": {
-      "id": 1003,
-      "first_name": "edddd",
-      "last_name": "Walker",
-      "email": "ed@walker.com"
-    },
+    "before": null,
     "after": {
-      "id": 1003,
-      "first_name": "easd",
-      "last_name": "Walker",
-      "email": "ed@walker.com"
+      "id": 1005,
+      "first_name": "edwardo",
+      "last_name": "hills",
+      "email": "email@email.com"
     },
     "source": {
       "version": "0.10.0.Final",
       "connector": "mysql",
       "name": "dbserver1",
-      "ts_ms": 1574043705000,
+      "ts_ms": 1574125390000,
       "snapshot": "false",
       "db": "inventory",
       "table": "customers",
       "server_id": 223344,
       "gtid": null,
-      "file": "mysql-bin.000008",
-      "pos": 2823,
+      "file": "mysql-bin.000003",
+      "pos": 708,
       "row": 0,
-      "thread": 12,
+      "thread": 7,
       "query": null
     },
-    "op": "u",
-    "ts_ms": 1574043705079
+    "op": "c",
+    "ts_ms": 1574125390626
   }
 }

@@ -64,8 +64,14 @@ public class ConsumerService {
     final ObjectMapper mapper = new ObjectMapper();
     DebezRecord dRecord = mapper.readValue(record.toString(), DebezRecord.class);
 
-    log.info("First Name Before: [{}]", dRecord.getPayload().getBefore().getFirstName());
-    log.info("First Name After: [{}]", dRecord.getPayload().getAfter().getFirstName());
+    if (dRecord.getPayload().getBefore() != null) {
+      log.info("First Name Before: [{}]", dRecord.getPayload().getBefore().getFirstName());
+      log.info("First Name After: [{}]", dRecord.getPayload().getAfter().getFirstName());
+    } else {
+      log.info("Insert Record New First Name: [{}]", dRecord.getPayload().getAfter().getFirstName());
+    }
+
+    
 
     // log.info(dRecord.getSchema().toString());
   }

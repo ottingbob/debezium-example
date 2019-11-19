@@ -14,7 +14,12 @@ buildscript {
 	ext {
 		springBootVersion = '2.2.1.RELEASE'
 	}
-	repositories { jcenter() }
+	repositories { 
+		jcenter() 
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
 		classpath "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
@@ -22,7 +27,6 @@ buildscript {
 		classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.0'
 	}
 }
-
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -70,19 +74,29 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
+task removeFiles(type: Delete) {
+	delete "${project.buildDir}/generated/" 
+}
+
 task moveFiles(type: Copy) {
-	from "${project.buildDir}/generated/"
-	into "${sourceSets.main.java.srcDirs[0]}/"
+	from "${project.buildDir}/generated/com"
+	into "${sourceSets.main.java.srcDirs[0]}/com"
 }
 
 // Alias for generateJsonSchema2Pojo
 task generate {
-	dependsOn generateJsonSchema2Pojo, moveFiles
+	dependsOn generateJsonSchema2Pojo, moveFiles, removeFiles
 
 	doLast {
 		println "Generated the JSON Schema from location: ${sourceSets.main.output.resourcesDir}/static"
 		// Print out all files in build directory
 		println fileTree("${project.buildDir}").filter { it.isFile() }.files.name		
+	}
+}
+
+gradle.taskGraph.whenReady {
+	graph -> if (graph.hasTask(run)) {
+		generateJsonSchema2Pojo.enabled = false
 	}
 }
 
