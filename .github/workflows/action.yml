@@ -1,4 +1,4 @@
 - name: Gradle Command
-  on: commit
+  on: [push]
   uses: eskatos/gradle-command-action@v1
   arguments: build
