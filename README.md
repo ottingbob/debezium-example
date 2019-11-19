@@ -1,8 +1,6 @@
 ### Debez Knees
 
-![](https://github.com/ottingbob/debezium-example/workflows/.github/workflows/action.yml/badge.svg)
-
-![](https://github.com/ottingbob/debezium-example/workflows/Run%20Gradle%20on%20PRs/badge.svg)
+![](https://github.com/ottingbob/debezium-example/workflows/Gradle%20Generate%20and%20Build/badge.svg)
 
 `docker-compose up --build`
 
