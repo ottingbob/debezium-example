@@ -1,15 +1,15 @@
 
 # Generated Files
 
-src/main/java/com/debez/consumer/models/**
+# !**/src/main/**
 src/main/java/com/debez/consumer/models/
+
 
 ### Initializr ###
 HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**
 !**/src/test/**
 
 ### STS ###
