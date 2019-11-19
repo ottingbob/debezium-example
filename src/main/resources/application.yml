@@ -11,8 +11,8 @@ spring:
       enabled: "ALWAYS"
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
-      group-id: group_id
+      # bootstrap-servers: localhost:9092
+      # group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

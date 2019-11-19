@@ -35,9 +35,14 @@ public class ConsumerService {
 
   @Bean
   public ConsumerFactory<String, String> consumerFactory() {
-      final Map<String, Object> props = new HashMap<>();
-    // props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    final Map<String, Object> props = new HashMap<>();
+    
+    String kafkaUrl = System.getenv("KAFKA_URL");
+    if (kafkaUrl == null) {
+      kafkaUrl = "localhost:9092";
+    }
+    
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
     props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
     
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

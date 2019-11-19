@@ -49,6 +49,15 @@ services:
       - debez 
       #  --link zookeeper:zookeeper --link kafka:kafka --link mysql:mysql 
       
+  consumer-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - '9000:9000'
+    networks:
+      - debez
 
 networks:
   debez:
