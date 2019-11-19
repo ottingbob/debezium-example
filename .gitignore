@@ -1,4 +1,9 @@
 
+# Generated Files
+
+src/main/java/com/debez/consumer/models/
+
+### Initializr ###
 HELP.md
 .gradle
 build/
