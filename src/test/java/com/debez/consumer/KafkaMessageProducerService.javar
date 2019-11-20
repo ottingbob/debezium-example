@@ -1,0 +1,47 @@
+package com.debez.consumer;
+
+import com.debez.consumer.models.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
+@Service
+public class KafkaMessageProducerService {
+
+  Logger LOGGER = LoggerFactory.getLogger(KafkaMessageProducerTest.class);
+
+  private static final String TOPIC_NAME = "topic-name";
+
+  private final KafkaTemplate<String, String> kafkaTemplate;
+
+  @Autowired
+  public KafkaMessageProducerService(KafkaTemplate<String, String> kafkaTemplate) {
+    this.kafkaTemplate = kafkaTemplate;
+  }
+
+  public void send(DebezRecord record) {
+    kafkaTemplate.send(TOPIC_NAME, record.toString());
+  }
+
+  public void sendMessage(DebezRecord record) {
+    ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(TOPIC_NAME, record.toString());
+    future.addCallback(new ListenableFutureCallback<>() {
+      @Override
+      public void onSuccess(SendResult<String, String> result) {
+        LOGGER.info("Send event: {}", result);
+      }
+
+      @Override
+      public void onFailure(Throwable ex) {
+        LOGGER.error("Unable to send message: {}", ex.getMessage());
+      }
+    });
+  }
+
+}

@@ -1,0 +1,76 @@
+package com.debez.consumer;
+
+import com.debez.consumer.models.*;
+
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.Assert.assertThat;
+import static org.springframework.kafka.test.hamcrest.KafkaMatchers.hasKey;
+import static org.springframework.kafka.test.hamcrest.KafkaMatchers.hasValue;
+import static org.springframework.kafka.test.utils.KafkaTestUtils.getSingleRecord;
+
+import java.util.Map;
+
+@RunWith(SpringRunner.class)
+@EmbeddedKafka(
+  partitions = 1,
+  topics = {
+    KafkaProducerTest.TOPIC_NAME
+  }
+)
+@SpringBootTest(
+  properties = "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
+  classes = { KafkaMessageProducerService.class }
+)
+public class KafkaProducerTest {
+
+  public final static String TOPIC_NAME = "topic-name";
+
+  @Autowired
+  private EmbeddedKafkaBroker embeddedKafka;
+
+  @Autowired
+  KafkaMessageProducerService service;
+
+  @Test
+  public void test_send() {
+    DebezRecord sendRecord = new DebezRecord().withPayload(
+      new Payload().withOp("u").withSource(
+        new Source().withName("name")));
+    service.send(sendRecord);
+
+    final Consumer<String, String> consumer = buildConsumer(
+      StringDeserializer.class,
+      StringDeserializer.class
+    );
+
+    embeddedKafka.consumeFromEmbeddedTopics(consumer, TOPIC_NAME);
+    final ConsumerRecord<String, String> record = getSingleRecord(consumer, TOPIC_NAME, 500);
+    
+    assertThat(record, hasValue("u"));
+  }
+
+  private <K, V> Consumer<K, V> buildConsumer(Class<? extends Deserializer> keyDeserializer, Class<? extends Deserializer> valueDeserializer) {
+    final Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test", "true", embeddedKafka);
+    consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer.getName());
+    consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer.getName());
+
+    final DefaultKafkaConsumerFactory<K, V> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
+    return consumerFactory.createConsumer();
+  }
+
+}

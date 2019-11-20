@@ -1,0 +1,7 @@
+kafka-config: test
+spring:
+  output:
+    ansi:
+      enabled: "ALWAYS"
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}

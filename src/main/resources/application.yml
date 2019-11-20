@@ -1,3 +1,4 @@
+kafka-config: running
 server: 
   port: 9000
 spring:

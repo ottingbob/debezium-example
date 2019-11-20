@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EnableKafka
 @Configurable
 @Configuration
+@ConditionalOnProperty(value="kafka-config", havingValue="running")
 public class ConsumerService {
  
   public static final String TOPIC_NAME = "dbserver1.inventory.customers"; 
