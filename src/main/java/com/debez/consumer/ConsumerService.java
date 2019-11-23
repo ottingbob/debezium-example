@@ -47,7 +47,8 @@ public class ConsumerService {
   @PostConstruct
   public void init() {
     log.info("Starting ConsumerService with TOPIC_NAME: {}", TOPIC_NAME);
-    log.info("Factory bootstrap-servers [{}]", factory.getConsumerFactory().getConfigurationProperties().get("bootstrap.servers"));
+    log.info("Factory bootstrap-servers [{}]", factory.getConsumerFactory()
+      .getConfigurationProperties().get("bootstrap.servers"));
     log.info("Registry Container Count [{}]", registry.getAllListenerContainers().size());
 
     registry.getListenerContainers().stream().forEach(container -> {
@@ -55,7 +56,6 @@ public class ConsumerService {
     });
 
   }
-
 
   // autoStartup = "false", 
   @KafkaListener(id = "listener", topics = TOPIC_NAME, groupId = GROUP_ID, containerFactory = "kafkaListenerContainerFactory")

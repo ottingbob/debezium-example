@@ -1,7 +1,5 @@
 package com.debez.consumer.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -9,19 +7,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.messaging.handler.annotation.Payload;
 
 import io.netty.util.internal.StringUtil;
 
 import java.util.Map;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.debez.consumer.Operation;
-import com.debez.consumer.models.*;
 import static com.debez.consumer.configuration.ConsumerConstants.*;
 
 
@@ -29,11 +22,6 @@ import static com.debez.consumer.configuration.ConsumerConstants.*;
 @Configuration("consumer-config")
 @ConditionalOnProperty(value = "kafka-config", havingValue = "running")
 public class ConsumerConfiguration {
-
-  // public ConsumerFactory<String, String> consumerFactory = consumerFactory();
-
-  // @Getter @Setter
-  // private String name;
 
   @Bean
   public ConsumerFactory<Object, Object> consumerFactory() {
@@ -51,8 +39,6 @@ public class ConsumerConfiguration {
 
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-
-    // this.setName("factory-init");
 
     return new DefaultKafkaConsumerFactory<>(props);
   }
