@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import java.util.Map;
 import java.util.HashMap;
 
-import com.debez.consumer.configuration.HealthCheckConfiguration;
 import com.debez.consumer.models.DebezRecord;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.debez.consumer.configuration.ConsumerConstants.*;
@@ -24,12 +23,8 @@ import static com.debez.consumer.configuration.ConsumerConstants.*;
 @ConditionalOnProperty(value = "kafka-config", havingValue = "running")
 public class ConsumerService {
 
-  private final HealthCheckConfiguration healthCheck;
-
-  public ConsumerService(HealthCheckConfiguration healthCheck) {
-  // public ConsumerService() {
+  public ConsumerService() {
     log.info("Starting ConsumerService with TOPIC_NAME: {}", TOPIC_NAME);
-    this.healthCheck = healthCheck;
   }
 
   @KafkaListener(topics = TOPIC_NAME, groupId = GROUP_ID)

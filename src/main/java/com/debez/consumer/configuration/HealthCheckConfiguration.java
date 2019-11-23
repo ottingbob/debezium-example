@@ -7,8 +7,8 @@ import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Component;
 
@@ -22,23 +22,18 @@ import static com.debez.consumer.configuration.ConsumerConstants.GROUP_ID;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(value = "kafka-config", havingValue = "running")
 public class HealthCheckConfiguration {
 
-  public KafkaAdmin admin;
-  // private final ApplicationRunner runner;
   private final CountDownLatch countDownLatch;
 
   public HealthCheckConfiguration() throws InterruptedException {
-    this.admin = kafkaAdmin();
-    // this.runner = healthCheckRunner(admin);
 
     this.countDownLatch = new CountDownLatch(1);
     
     // Health Check Manages the CountDownLatch
     Runnable runnable = () -> {
       try {
-        // Start health check runner
-        healthCheckRunner(this.admin);
         this.countDownLatch.await();
         System.exit(0);
       } catch (InterruptedException e) {
@@ -50,6 +45,7 @@ public class HealthCheckConfiguration {
 
   }
 
+  @Bean
   KafkaAdmin kafkaAdmin() {
     final Map<String, Object> props = new HashMap<>();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -60,8 +56,8 @@ public class HealthCheckConfiguration {
     return admin;
   }
 
-  // ApplicationRunner healthCheckRunner(KafkaAdmin admin) throws InterruptedException {
-  public void healthCheckRunner(KafkaAdmin admin) throws InterruptedException {
+  @Bean
+  ApplicationRunner healthCheckRunner(KafkaAdmin admin) throws InterruptedException {
     log.info("Starting Health Check Bean");
     admin.setFatalIfBrokerNotAvailable(true);
 
@@ -88,20 +84,20 @@ public class HealthCheckConfiguration {
     client1.close();
     log.info("Broker is up! Stopping health check connection");
 
-    // return args -> {
-    //   try (AdminClient client = AdminClient.create(admin.getConfig())) {
-    //     log.warn(client.toString());
-    //     while(true) {
-    //       Map<String, ConsumerGroupDescription> map =
-    //         client.describeConsumerGroups(Collections.singletonList(GROUP_ID))
-    //           .all().get(10, TimeUnit.SECONDS);
-    //       log.info(map.toString());
-    //       System.in.read();
-    //       Thread.sleep(10000L);
-    //     }
-    //   } catch (Exception ex) {
-    //     log.error("gotem");
-    //   }
-    // };
+    return args -> {
+      try (AdminClient client = AdminClient.create(admin.getConfig())) {
+        log.warn(client.toString());
+        while(true) {
+          Map<String, ConsumerGroupDescription> map =
+            client.describeConsumerGroups(Collections.singletonList(GROUP_ID))
+              .all().get(10, TimeUnit.SECONDS);
+          log.info(map.toString());
+          System.in.read();
+          Thread.sleep(10000L);
+        }
+      } catch (Exception ex) {
+        log.error("gotem");
+      }
+    };
   }
 }
