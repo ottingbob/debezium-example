@@ -52,7 +52,7 @@ public class KTTest {
   private KafkaTemplate<String, DebezRecord> kafkaTemplate;
 
   public ProducerFactory<String, DebezRecord> producerFactory() {
-    Map<String, Object> configProps = new HashMap();
+    Map<String, Object> configProps = new HashMap<>();
     configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:3333");
     configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);

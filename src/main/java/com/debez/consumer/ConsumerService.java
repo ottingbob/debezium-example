@@ -3,15 +3,11 @@ package com.debez.consumer;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.listener.MessageListenerContainer;
@@ -23,7 +19,6 @@ import javax.annotation.PostConstruct;
 
 import java.util.HashMap;
 
-import com.debez.consumer.configuration.ListenerConfiguration;
 import com.debez.consumer.models.DebezRecord;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.debez.consumer.configuration.ConsumerConstants.*;
@@ -49,15 +44,14 @@ public class ConsumerService {
     log.info("Starting ConsumerService with TOPIC_NAME: {}", TOPIC_NAME);
     log.info("Factory bootstrap-servers [{}]", factory.getConsumerFactory()
       .getConfigurationProperties().get("bootstrap.servers"));
+
     log.info("Registry Container Count [{}]", registry.getAllListenerContainers().size());
 
     registry.getListenerContainers().stream().forEach(container -> {
       log.info("Listener ID: [{}]", ((MessageListenerContainer) container).getListenerId());
     });
-
   }
 
-  // autoStartup = "false", 
   @KafkaListener(id = "listener", topics = TOPIC_NAME, groupId = GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
   public void listen(@Payload(required = false) final String record) throws Exception {
 

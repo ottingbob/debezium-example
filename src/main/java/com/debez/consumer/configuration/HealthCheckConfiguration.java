@@ -5,32 +5,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.Collections;
-import java.util.HashMap;
 
 import static com.debez.consumer.configuration.ConsumerConstants.GROUP_ID;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(value = "kafka-config", havingValue = "running-DOWN")
+@ConditionalOnProperty(value = "kafka-config", havingValue = "running")
 @AutoConfigureAfter(ConsumerConfiguration.class)
 public class HealthCheckConfiguration {
+
+  @Autowired
+  public ConsumerFactory<Object, Object> configFactory;
 
   private final CountDownLatch countDownLatch;
 
   public HealthCheckConfiguration() throws InterruptedException {
-
     this.countDownLatch = new CountDownLatch(1);
     
     // Health Check Manages the CountDownLatch
@@ -44,26 +48,28 @@ public class HealthCheckConfiguration {
     };
     Thread t = new Thread(runnable);
     t.start();
-
   }
 
-  KafkaAdmin kafkaAdmin() {
-    final Map<String, Object> props = new HashMap<>();
+  private Map<String, Object> copyMap(Map<String, Object> sourceMap) {
+    Map<String, Object> newMap = new HashMap<>();
 
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-    
-    KafkaAdmin admin = new KafkaAdmin(props);
-    admin.setFatalIfBrokerNotAvailable(true);
-    admin.setCloseTimeout(1);
+    for(Entry<String, Object> entry : sourceMap.entrySet()) {
+      newMap.put(entry.getKey(), entry.getValue());
+    }
 
-    return admin;
+    return newMap;
   }
 
   @Bean
-  ApplicationRunner healthCheckRunner() throws InterruptedException {
+  ApplicationRunner healthCheckRunner(ConsumerFactory<Object, Object> configFactory) throws InterruptedException {
     log.info("Starting Health Check Bean");
 
-    KafkaAdmin admin = kafkaAdmin();
+    Map<String, Object> props = copyMap(configFactory.getConfigurationProperties());
+    props.remove("key.deserializer");
+    props.remove("value.deserializer");
+    props.remove("group.id");
+    KafkaAdmin admin = new KafkaAdmin(props);
+
     log.info("Received boostrap servers config: [{}]", admin.getConfig().get("bootstrap.servers"));
     admin.setFatalIfBrokerNotAvailable(true);
 
