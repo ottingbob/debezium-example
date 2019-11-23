@@ -4,6 +4,8 @@
 
 `docker-compose up --build`
 
+```Don't forget to send the POST request to the connector service```
+
 `./gradlew run`
 
 `docker exec -it mysql /bin/bash`
