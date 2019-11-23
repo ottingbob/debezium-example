@@ -7,6 +7,7 @@ import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaAdmin;
@@ -22,7 +23,8 @@ import static com.debez.consumer.configuration.ConsumerConstants.GROUP_ID;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(value = "kafka-config", havingValue = "running")
+@ConditionalOnProperty(value = "kafka-config", havingValue = "running-DOWN")
+@AutoConfigureAfter(ConsumerConfiguration.class)
 public class HealthCheckConfiguration {
 
   private final CountDownLatch countDownLatch;
@@ -45,10 +47,11 @@ public class HealthCheckConfiguration {
 
   }
 
-  @Bean
   KafkaAdmin kafkaAdmin() {
     final Map<String, Object> props = new HashMap<>();
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+    
     KafkaAdmin admin = new KafkaAdmin(props);
     admin.setFatalIfBrokerNotAvailable(true);
     admin.setCloseTimeout(1);
@@ -57,8 +60,11 @@ public class HealthCheckConfiguration {
   }
 
   @Bean
-  ApplicationRunner healthCheckRunner(KafkaAdmin admin) throws InterruptedException {
+  ApplicationRunner healthCheckRunner() throws InterruptedException {
     log.info("Starting Health Check Bean");
+
+    KafkaAdmin admin = kafkaAdmin();
+    log.info("Received boostrap servers config: [{}]", admin.getConfig().get("bootstrap.servers"));
     admin.setFatalIfBrokerNotAvailable(true);
 
     // So this gets only checked at initialization ... pretty bad implementation
@@ -86,7 +92,7 @@ public class HealthCheckConfiguration {
 
     return args -> {
       try (AdminClient client = AdminClient.create(admin.getConfig())) {
-        log.warn(client.toString());
+        log.info("Received boostrap servers config: [{}]", admin.getConfig().get("bootstrap.servers"));
         while(true) {
           Map<String, ConsumerGroupDescription> map =
             client.describeConsumerGroups(Collections.singletonList(GROUP_ID))

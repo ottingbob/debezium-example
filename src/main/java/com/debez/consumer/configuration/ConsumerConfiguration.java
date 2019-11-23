@@ -1,14 +1,20 @@
 package com.debez.consumer.configuration;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.messaging.handler.annotation.Payload;
+
+import io.netty.util.internal.StringUtil;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -20,17 +26,24 @@ import static com.debez.consumer.configuration.ConsumerConstants.*;
 
 
 @Slf4j
-@Configuration
+@Configuration("consumer-config")
+@ConditionalOnProperty(value = "kafka-config", havingValue = "running")
 public class ConsumerConfiguration {
 
-  public ConsumerFactory<String, String> consumerFactory = consumerFactory();
+  // public ConsumerFactory<String, String> consumerFactory = consumerFactory();
 
-  public ConsumerFactory<String, String> consumerFactory() {
+  // @Getter @Setter
+  // private String name;
+
+  @Bean
+  public ConsumerFactory<Object, Object> consumerFactory() {
     final Map<String, Object> props = new HashMap<>();
 
     String kafkaUrl = System.getenv("KAFKA_URL");
-    if (kafkaUrl == null) {
+    log.info("Read KAFKA_URL env to be [{}]", kafkaUrl);
+    if (StringUtil.isNullOrEmpty(kafkaUrl)) {
       kafkaUrl = "localhost:9092";
+      log.info("Set bootstrap_servers to be [{}]", kafkaUrl);
     }
 
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
@@ -38,6 +51,8 @@ public class ConsumerConfiguration {
 
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+    // this.setName("factory-init");
 
     return new DefaultKafkaConsumerFactory<>(props);
   }
