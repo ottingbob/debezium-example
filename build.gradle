@@ -50,6 +50,9 @@ repositories {
 }
 
 dependencies {
+	// Kafka Binder
+	implementation "org.springframework.cloud:spring-cloud-starter-stream-kafka:2.1.4.RELEASE"
+
 	// Lombok
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

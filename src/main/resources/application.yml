@@ -21,3 +21,14 @@ spring:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  # cloud:
+  #   stream:
+  #     binders:
+  #       mykafka:
+  #         type: kafka
+  #     bindings:
+  #       input:
+  #         binder: mykafka  
+
+# spring.cloud.stream.binders.mykafka.type=kafka
+# spring.cloud.stream.bindings.input.binder=mykafka
