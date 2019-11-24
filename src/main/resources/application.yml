@@ -1,4 +1,6 @@
-kafka-config: running
+# kafka-config: running
+kafka-config: alternate
+
 server: 
   port: 9000
 spring:

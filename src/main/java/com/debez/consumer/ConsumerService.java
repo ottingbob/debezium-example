@@ -2,6 +2,9 @@ package com.debez.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +13,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.messaging.handler.annotation.Payload;
 
@@ -17,6 +21,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.debez.consumer.models.DebezRecord;
@@ -31,13 +37,10 @@ import static com.debez.consumer.configuration.ConsumerConstants.*;
 public class ConsumerService {
 
   @Autowired
-  public ConcurrentKafkaListenerContainerFactory<String, String> factory;
+  public ConcurrentKafkaListenerContainerFactory<Object, Object> factory;
 
   @Autowired
   private KafkaListenerEndpointRegistry registry;
-
-  @Autowired
-  public ConsumerFactory<Object, Object> consumerFactory;
 
   @PostConstruct
   public void init() {
@@ -50,6 +53,64 @@ public class ConsumerService {
     registry.getListenerContainers().stream().forEach(container -> {
       log.info("Listener ID: [{}]", ((MessageListenerContainer) container).getListenerId());
     });
+
+    factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
+
+      @Override
+      public void onPartitionsRevokedBeforeCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+        SaveOffsetsOnRebalance listener = new SaveOffsetsOnRebalance(consumer);
+        listener.onPartitionsAssigned(partitions);
+        // log.warn("onPartitionsRevokedBeforeCommit()");
+      }
+  
+      @Override
+      public void onPartitionsRevokedAfterCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+        log.warn("onPartitionsRevokedAfterCommit()");
+      }
+  
+      @Override
+      public void onPartitionsAssigned(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+        // log.warn("onPartitionsAssigned()");
+        SaveOffsetsOnRebalance listener = new SaveOffsetsOnRebalance(consumer);
+        listener.onPartitionsAssigned(partitions);
+      }
+    });  
+
+    // factory.getContainerProperties().setConsumerRebalanceListener(new SaveOffsetsOnRebalance());
+    ConsumerRebalanceListener listener = factory.getContainerProperties().getConsumerRebalanceListener();
+    listener.onPartitionsAssigned(Collections.singletonList(new TopicPartition("clown_town", 5)));
+  }
+
+
+
+  public class SaveOffsetsOnRebalance implements ConsumerRebalanceListener {
+    private Consumer<?,?> consumer;
+
+    public SaveOffsetsOnRebalance(Consumer<?,?> consumer) {
+        this.consumer = consumer;
+    }
+
+    // public void onPartitionsRevokedBeforeCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+    //   log.error("onPartitionsRevokedBeforeCommit()");
+    // }
+
+    // public void onPartitionsRevokedAfterCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+    //   log.error("onPartitionsRevokedAfterCommit()");
+    // }
+
+    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+        // save the offsets in an external store using some custom code not described here
+        // for(TopicPartition partition: partitions)
+        //    saveOffsetInExternalStore(consumer.position(partition));
+        log.error("onPartitionsRevoked()");
+    }
+
+    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+        // read the offsets from an external store using some custom code not described here
+        // for(TopicPartition partition: partitions)
+        //    consumer.seek(partition, readOffsetFromExternalStore(partition));
+        log.error("onPartitionsAssigned()");
+    }
   }
 
   @KafkaListener(id = "listener", topics = TOPIC_NAME, groupId = GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
