@@ -1,5 +1,8 @@
 # kafka-config: running
 kafka-config: alternate
+tpd:
+  topic-name: advice-topic
+  messages-per-request: 10
 
 server: 
   port: 9000

@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RebalanceListener implements ConsumerRebalanceListener {
-
+  
   private Collection<TopicPartition> assigned;
 
   @Override
