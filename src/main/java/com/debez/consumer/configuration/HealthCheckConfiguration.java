@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.Collections;
 
+import com.debez.consumer.oldconfig.ConsumerConfiguration;
 import static com.debez.consumer.configuration.ConsumerConstants.GROUP_ID;
 
 @Slf4j

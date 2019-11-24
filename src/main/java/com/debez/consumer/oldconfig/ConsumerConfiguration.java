@@ -1,4 +1,4 @@
-package com.debez.consumer.configuration;
+package com.debez.consumer.oldconfig;
 
 import lombok.extern.slf4j.Slf4j;
 

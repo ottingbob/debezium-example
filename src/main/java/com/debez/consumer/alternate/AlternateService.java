@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import static com.debez.consumer.configuration.ConsumerConstants.*;
 
 @Slf4j
 @EnableAutoConfiguration
@@ -54,6 +55,7 @@ public class AlternateService {
     }
 
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     return props;

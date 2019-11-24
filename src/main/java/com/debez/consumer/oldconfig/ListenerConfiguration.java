@@ -1,4 +1,4 @@
-package com.debez.consumer.configuration;
+package com.debez.consumer.oldconfig;
 
 import java.util.Collection;
 
