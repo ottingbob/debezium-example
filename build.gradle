@@ -10,9 +10,10 @@
 // }
 //===============================================================================//
 
+
 buildscript {
 	ext {
-		springBootVersion = '2.2.1.RELEASE'
+		springBootVersion = "2.2.1.RELEASE"
 	}
 	repositories { 
 		jcenter() 
@@ -43,6 +44,7 @@ sourceCompatibility = '11'
 mainClassName = 'com.debez.consumer.ConsumerApplication'
 
 def lombokVersion = '1.18.10'
+def springBootVersion = '2.2.1.RELEASE'
 
 repositories {
 	mavenCentral()
@@ -65,8 +67,12 @@ dependencies {
 		// exclude group: 'org.apache.tomcat'
 	}
 
-	implementation 'org.springframework.boot:spring-boot-starter-reactor-netty:2.2.1.RELEASE'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux:2.2.1.RELEASE'
+	// Spring Actuator
+	implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+
+	// Reactive Web
+	implementation "org.springframework.boot:spring-boot-starter-reactor-netty:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
 
 	implementation 'org.springframework.kafka:spring-kafka'
 

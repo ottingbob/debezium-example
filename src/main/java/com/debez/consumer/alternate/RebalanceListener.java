@@ -7,6 +7,8 @@ import org.apache.kafka.common.TopicPartition;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.debez.consumer.server.RebalanceHandler;
+
 @Slf4j
 public class RebalanceListener implements ConsumerRebalanceListener {
   
@@ -14,6 +16,7 @@ public class RebalanceListener implements ConsumerRebalanceListener {
 
   @Override
   public void onPartitionsRevoked(Collection<TopicPartition> collection) {
+    RebalanceHandler.COUNTER.incrementAndGet();
     log.warn("onPartitionsRevoked()");
   }
 
